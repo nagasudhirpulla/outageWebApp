@@ -1,0 +1,18 @@
+﻿@using OutageDataLayer.QueryResultModels
+@using OutageDataLayer.QueryModels
+@model List<OutageDataLayer.QueryResultModels.OutageQueryResult>
+@{
+    ViewData["Title"] = "Home Page";
+}
+
+<h2>@ViewData["Title"]</h2>
+<h3>@ViewData["Message"]</h3>
+
+<form asp-action="Index" method="post">
+    <span></span>
+    <input type="number" name="ElementId" />
+    <input type="text" name="OutageType" />
+    <input type="text" name="ElementType" />
+    <input type="date" name="OutFromDate" />
+    <input type="submit" class="btn btn-success" value="Search" />
+</form>

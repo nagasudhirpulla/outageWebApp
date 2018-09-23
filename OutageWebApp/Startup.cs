@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.CodeAnalysis;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -31,7 +32,20 @@ namespace OutageWebApp
             });
 
 
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+            //services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+
+            services.AddMvc()
+                .SetCompatibilityVersion(CompatibilityVersion.Version_2_1)
+                .AddRazorOptions(options =>
+                {
+                    var previous = options.CompilationCallback;
+                    options.CompilationCallback = context =>
+                    {
+                        previous?.Invoke(context);
+
+                        context.Compilation = context.Compilation.AddReferences(MetadataReference.CreateFromFile(typeof(OutageDataLayer.QueryResultModels.OutageQueryResult).Assembly.Location));
+                    };
+                });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
