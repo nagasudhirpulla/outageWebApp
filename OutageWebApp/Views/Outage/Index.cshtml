@@ -1,6 +1,6 @@
 ﻿@model IEnumerable<OutageDataLayer.QueryResultModels.OutageQueryResult>
 @{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "View Outages";
     Layout = "~/Views/Shared/_DataTablesLayout.cshtml";
 }
 
@@ -34,7 +34,7 @@
                 ElementName
             </th>
             <th>
-                ElementType
+                Element Owner
             </th>
             <th>
                 OutTime
@@ -47,6 +47,9 @@
             </th>
             <th>
                 OutageReason
+            </th>
+            <th>
+                ElementType
             </th>
         </tr>
     </thead>
@@ -61,7 +64,10 @@
                     @item.ElementName
                 </td>
                 <td>
-                    @item.ElementType
+                    @if (!string.IsNullOrEmpty(item.ElementOwner))
+                    {
+                        @item.ElementOwner
+                    }
                 </td>
                 <td>
                     @item.OutTime.ToString("dd-MMM-yy HH:mm")
@@ -81,6 +87,10 @@
                         @item.OutageReason
                     }
                 </td>
+                <td>
+                    @item.ElementType
+                </td>
+
             </tr>
         }
     </tbody>

@@ -9,12 +9,11 @@
     var table = $('#outageResultsDiv').DataTable({
         scrollY: "1000px",
         scrollX: true,
+        dom: 'Bfrtip',
         scrollCollapse: true,
-        fixedColumns: true,        
+        fixedColumns: true,
         lengthMenu: [[10, 25, 50, 100, 500, 1000, -1], [10, 25, 50, 100, 500, 1000, "All"]],
-        buttons: [
-            'copy', 'csv', 'excel', 'pdf', 'print'
-        ],
+        buttons: ['copyHtml5', 'excelHtml5', 'csvHtml5', 'pdfHtml5'],
         pageLength: 50
     });
 
