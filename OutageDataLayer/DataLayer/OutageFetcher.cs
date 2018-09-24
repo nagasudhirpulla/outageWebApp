@@ -21,7 +21,7 @@ namespace OutageDataLayer.DataLayer
             TRUNC(O.OUT_DATE)=TO_DATE('21-SEP-18','dd-MON-yy')
             order by O.OUT_DATE desc;
             */
-            string mainQueryPrefix = "SELECT COALESCE(E.VOL_RATING,'NA'), E.ELEMENT_NAME, E.OWNER_NAME, O.* FROM OUTAGES O LEFT OUTER JOIN(SELECT ELEMENTS.*, OWNERS.NAME AS OWNER_NAME FROM ELEMENTS LEFT OUTER JOIN OWNERS ON OWNERS.ID = ELEMENTS.OWNER_ID) E ON O.ELEMENT_ID = E.ELEMENT_ID ";
+            string mainQueryPrefix = "SELECT COALESCE(E.VOL_RATING,'NA') AS VOL_RATING, E.ELEMENT_NAME, E.OWNER_NAME, O.* FROM OUTAGES O LEFT OUTER JOIN(SELECT ELEMENTS.*, OWNERS.NAME AS OWNER_NAME FROM ELEMENTS LEFT OUTER JOIN OWNERS ON OWNERS.ID = ELEMENTS.OWNER_ID) E ON O.ELEMENT_ID = E.ELEMENT_ID ";
             //examine the query params
             List<string> whereStrings = new List<string>();
             List<OracleParameter> whereParams = new List<OracleParameter>();
@@ -41,6 +41,13 @@ namespace OutageDataLayer.DataLayer
             }
 
             // hangle outage type
+            if (outageQuery.ReasonSearchText != null)
+            {
+                whereStrings.Add("UPPER(O.COMMENTS) LIKE :comment_search");
+                whereParams.Add(new OracleParameter("comment_search", "%" + outageQuery.ReasonSearchText.ToUpper() + "%"));
+            }
+
+            // hangle reason text
             if (outageQuery.OutageType != null)
             {
                 whereStrings.Add("O.REASON_TYPE = :outage_type");
@@ -87,14 +94,14 @@ namespace OutageDataLayer.DataLayer
             TableRowsApiResultModel tableRowsResult = queryExecuter.GetDbTableRows(mainQuery, whereParams);
             // iterate through rows and return the queryresult
             List<OutageQueryResult> outageQueryResults = new List<OutageQueryResult>();
-            int elementIdIndex= tableRowsResult.TableColNames.IndexOf("ELEMENT_ID");
-            int elementNameIndex= tableRowsResult.TableColNames.IndexOf("ELEMENT_NAME");
-            int elementTypeIndex= tableRowsResult.TableColNames.IndexOf("DEV_TYPE");
-            int outageTypeIndex= tableRowsResult.TableColNames.IndexOf("REASON_TYPE");
-            int outTimeIndex= tableRowsResult.TableColNames.IndexOf("OUT_DATE");
-            int inTimeIndex= tableRowsResult.TableColNames.IndexOf("IN_DATE");
-            int voltageLevelIndex= tableRowsResult.TableColNames.IndexOf("VOL_RATING");
-            int outageReasonIndex = tableRowsResult.TableColNames.IndexOf("REASON_TYPE");
+            int elementIdIndex = tableRowsResult.TableColNames.IndexOf("ELEMENT_ID");
+            int elementNameIndex = tableRowsResult.TableColNames.IndexOf("ELEMENT_NAME");
+            int elementTypeIndex = tableRowsResult.TableColNames.IndexOf("DEV_TYPE");
+            int outageTypeIndex = tableRowsResult.TableColNames.IndexOf("REASON_TYPE");
+            int outTimeIndex = tableRowsResult.TableColNames.IndexOf("OUT_DATE");
+            int inTimeIndex = tableRowsResult.TableColNames.IndexOf("IN_DATE");
+            int voltageLevelIndex = tableRowsResult.TableColNames.IndexOf("VOL_RATING");
+            int outageReasonIndex = tableRowsResult.TableColNames.IndexOf("COMMENTS");
             int elementOwnerIndex = tableRowsResult.TableColNames.IndexOf("OWNER_NAME");
 
             for (int rowIter = 0; rowIter < tableRowsResult.TableRows.Count; rowIter++)
@@ -102,7 +109,7 @@ namespace OutageDataLayer.DataLayer
                 OutageQueryResult res = new OutageQueryResult();
                 if (elementIdIndex != -1)
                 {
-                    res.ElementId = Convert.ToInt32((decimal)tableRowsResult.TableRows[rowIter][elementIdIndex]);                    
+                    res.ElementId = Convert.ToInt32((decimal)tableRowsResult.TableRows[rowIter][elementIdIndex]);
                 }
                 if (elementNameIndex != -1)
                 {
@@ -127,6 +134,23 @@ namespace OutageDataLayer.DataLayer
                 if (voltageLevelIndex != -1)
                 {
                     res.VoltageLevel = (string)tableRowsResult.TableRows[rowIter][voltageLevelIndex];
+                }
+                if (outageTypeIndex != -1)
+                {
+                    var outageType = tableRowsResult.TableRows[rowIter][outageTypeIndex];
+                    if (outageType.GetType() != typeof(System.DBNull))
+                    {
+                        res.OutageType = (string)outageType;
+                    }
+
+                }
+                if (outageReasonIndex != -1)
+                {
+                    var outageReason = tableRowsResult.TableRows[rowIter][outageReasonIndex];
+                    if (outageReason.GetType() != typeof(System.DBNull))
+                    {
+                        res.OutageReason = (string)outageReason;
+                    }
                 }
                 outageQueryResults.Add(res);
             }
