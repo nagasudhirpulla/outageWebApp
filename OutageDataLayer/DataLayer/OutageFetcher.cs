@@ -21,7 +21,7 @@ namespace OutageDataLayer.DataLayer
             TRUNC(O.OUT_DATE)=TO_DATE('21-SEP-18','dd-MON-yy')
             order by O.OUT_DATE desc;
             */
-            string mainQueryPrefix = "SELECT COALESCE(E.VOL_RATING,'NA') AS VOL_RATING, E.ELEMENT_NAME, E.OWNER_NAME, O.* FROM OUTAGES O LEFT OUTER JOIN(SELECT ELEMENTS.*, OWNERS.NAME AS OWNER_NAME FROM ELEMENTS LEFT OUTER JOIN OWNERS ON OWNERS.ID = ELEMENTS.OWNER_ID) E ON O.ELEMENT_ID = E.ELEMENT_ID ";
+            string mainQueryPrefix = "SELECT COALESCE(E.VOL_RATING,'NA') AS VOL_RATING, E.ELEMENT_NAME, E.OWNER_NAME, O.*, SD_REASONS.REASON FROM OUTAGES O LEFT OUTER JOIN(SELECT ELEMENTS.*, OWNERS.NAME AS OWNER_NAME FROM ELEMENTS LEFT OUTER JOIN OWNERS ON OWNERS.ID = ELEMENTS.OWNER_ID) E ON O.ELEMENT_ID = E.ELEMENT_ID LEFT OUTER JOIN SD_REASONS ON SD_REASONS.REASON_ID = O.REASON_ID ";
             //examine the query params
             List<string> whereStrings = new List<string>();
             List<OracleParameter> whereParams = new List<OracleParameter>();
@@ -102,6 +102,7 @@ namespace OutageDataLayer.DataLayer
             int inTimeIndex = tableRowsResult.TableColNames.IndexOf("IN_DATE");
             int voltageLevelIndex = tableRowsResult.TableColNames.IndexOf("VOL_RATING");
             int outageReasonIndex = tableRowsResult.TableColNames.IndexOf("COMMENTS");
+            int outageCategoryIndex = tableRowsResult.TableColNames.IndexOf("REASON");
             int elementOwnerIndex = tableRowsResult.TableColNames.IndexOf("OWNER_NAME");
 
             for (int rowIter = 0; rowIter < tableRowsResult.TableRows.Count; rowIter++)
@@ -150,6 +151,14 @@ namespace OutageDataLayer.DataLayer
                     if (outageReason.GetType() != typeof(System.DBNull))
                     {
                         res.OutageReason = (string)outageReason;
+                    }
+                }
+                if (outageCategoryIndex != -1)
+                {
+                    var outageCategory = tableRowsResult.TableRows[rowIter][outageCategoryIndex];
+                    if (outageCategory.GetType() != typeof(System.DBNull))
+                    {
+                        res.OutageCategory = (string)outageCategory;
                     }
                 }
                 outageQueryResults.Add(res);

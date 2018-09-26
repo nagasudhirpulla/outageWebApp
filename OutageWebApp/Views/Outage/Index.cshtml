@@ -46,7 +46,10 @@
                 OutageType
             </th>
             <th>
-                OutageReason
+                Remarks
+            </th>
+            <th>
+                OutageCategory
             </th>
             <th>
                 ElementType
@@ -56,42 +59,48 @@
     <tbody>
         @foreach (var item in Model)
         {
-            <tr>
-                <td>
-                    @item.VoltageLevel
-                </td>
-                <td>
-                    @item.ElementName
-                </td>
-                <td>
-                    @if (!string.IsNullOrEmpty(item.ElementOwner))
-                    {
-                        @item.ElementOwner
-                    }
-                </td>
-                <td>
-                    @item.OutTime.ToString("dd-MMM-yy HH:mm")
-                </td>
-                <td>
-                    @item.InTime.ToString("dd-MMM-yy HH:mm")
-                </td>
-                <td>
-                    @if (!string.IsNullOrEmpty(item.OutageType))
-                    {
-                        @item.OutageType
-                    }
-                </td>
-                <td>
-                    @if (!string.IsNullOrEmpty(item.OutageReason))
-                    {
-                        @item.OutageReason
-                    }
-                </td>
-                <td>
-                    @item.ElementType
-                </td>
+        <tr>
+            <td>
+                @item.VoltageLevel
+            </td>
+            <td>
+                @item.ElementName
+            </td>
+            <td>
+                @if (!string.IsNullOrEmpty(item.ElementOwner))
+                {
+                    @item.ElementOwner
+                }
+            </td>
+            <td>
+                @item.OutTime.ToString("dd-MMM-yy HH:mm")
+            </td>
+            <td>
+                @item.InTime.ToString("dd-MMM-yy HH:mm")
+            </td>
+            <td>
+                @if (!string.IsNullOrEmpty(item.OutageType))
+                {
+                    @item.OutageType
+                }
+            </td>
+            <td>
+                @if (!string.IsNullOrEmpty(item.OutageReason))
+                {
+                    @item.OutageReason
+                }
+            </td>
+            <td>
+                @if (!string.IsNullOrEmpty(item.OutageCategory))
+                {
+                    @item.OutageCategory
+                }
+            </td>
+            <td>
+                @item.ElementType
+            </td>
 
-            </tr>
+        </tr>
         }
     </tbody>
     <tfoot>

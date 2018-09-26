@@ -15,6 +15,7 @@ namespace OutageDataLayer.QueryResultModels
         public DateTime InTime { get; set; }
         public string VoltageLevel { get; set; }
         public string OutageReason { get; set; }
+        public string OutageCategory { get; set; }
         public string ElementOwner { get; set; }
     }
 }
