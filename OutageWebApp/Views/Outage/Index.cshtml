@@ -52,6 +52,12 @@
                 OutageCategory
             </th>
             <th>
+                Outage Duration
+            </th>
+            <th>
+                Outage Hours
+            </th>
+            <th>
                 ElementType
             </th>
         </tr>
@@ -59,48 +65,76 @@
     <tbody>
         @foreach (var item in Model)
         {
-        <tr>
-            <td>
-                @item.VoltageLevel
-            </td>
-            <td>
-                @item.ElementName
-            </td>
-            <td>
-                @if (!string.IsNullOrEmpty(item.ElementOwner))
-                {
-                    @item.ElementOwner
-                }
-            </td>
-            <td>
-                @item.OutTime.ToString("dd-MMM-yy HH:mm")
-            </td>
-            <td>
-                @item.InTime.ToString("dd-MMM-yy HH:mm")
-            </td>
-            <td>
-                @if (!string.IsNullOrEmpty(item.OutageType))
-                {
-                    @item.OutageType
-                }
-            </td>
-            <td>
-                @if (!string.IsNullOrEmpty(item.OutageReason))
-                {
-                    @item.OutageReason
-                }
-            </td>
-            <td>
-                @if (!string.IsNullOrEmpty(item.OutageCategory))
-                {
-                    @item.OutageCategory
-                }
-            </td>
-            <td>
-                @item.ElementType
-            </td>
+            string spanTimeString;
+            string spanHrsString;
 
-        </tr>
+            @if (item.InTime.Year != 0001)
+            {
+                @*Show time span in hrs*@
+                TimeSpan spanTime = (item.InTime - item.OutTime);
+                spanTimeString = spanTime.ToString("g");
+                spanHrsString = string.Format("{0:N2}", spanTime.TotalHours);
+            }
+            else
+            {
+                spanTimeString = "---";
+                spanHrsString = "---";
+            }
+            <tr>
+                <td>
+                    @item.VoltageLevel
+                </td>
+                <td>
+                    @item.ElementName
+                </td>
+                <td>
+                    @if (!string.IsNullOrEmpty(item.ElementOwner))
+                    {
+                        @item.ElementOwner
+                    }
+                </td>
+                <td>
+                    @item.OutTime.ToString("dd-MMM-yy HH:mm")
+                </td>
+                <td>
+                    @if (item.InTime.Year != 0001)
+                    {
+                        @item.InTime.ToString("dd-MMM-yy HH:mm")
+                    }
+                    else
+                    {
+                        <span>-Unrevived-</span>
+                    }
+                </td>
+                <td>
+                    @if (!string.IsNullOrEmpty(item.OutageType))
+                    {
+                        @item.OutageType
+                    }
+                </td>
+                <td>
+                    @if (!string.IsNullOrEmpty(item.OutageReason))
+                    {
+                        @item.OutageReason
+                    }
+                </td>
+                <td>
+                    @if (!string.IsNullOrEmpty(item.OutageCategory))
+                    {
+                        @item.OutageCategory
+                    }
+                </td>
+                <td>
+                    @spanTimeString
+                </td>
+                <td>
+                    @spanHrsString
+                </td>
+                <td>
+                    @item.ElementType
+                </td>
+
+            </tr>
         }
     </tbody>
     <tfoot>
@@ -112,7 +146,7 @@
                 ElementName
             </th>
             <th>
-                ElementType
+                Element Owner
             </th>
             <th>
                 OutTime
@@ -124,7 +158,19 @@
                 OutageType
             </th>
             <th>
-                OutageReason
+                Remarks
+            </th>
+            <th>
+                OutageCategory
+            </th>
+            <th>
+                Outage Duration
+            </th>
+            <th>
+                Outage Hours
+            </th>
+            <th>
+                ElementType
             </th>
         </tr>
     </tfoot>

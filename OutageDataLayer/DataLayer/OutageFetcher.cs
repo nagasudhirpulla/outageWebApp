@@ -54,35 +54,39 @@ namespace OutageDataLayer.DataLayer
                 whereParams.Add(new OracleParameter("outage_type", outageQuery.OutageType));
             }
 
-            // hangle out date
+            // hangle in from date
+            if (outageQuery.InFromDate != null)
+            {
+                DateTime inFromTime = outageQuery.InFromDate.Value;
+                whereStrings.Add("( TRUNC(IN_DATE) >= TO_DATE(:in_from_date,'YYYY/MM/DD') )");
+                whereParams.Add(new OracleParameter("in_from_date", inFromTime.ToString("yyyy/MM/dd")));
+            }
+
+            // hangle in to date
+            if (outageQuery.InToDate != null)
+            {
+                DateTime inToTime = outageQuery.InToDate.Value;
+                whereStrings.Add("( TRUNC(IN_DATE) <= TO_DATE(:in_to_date,'YYYY/MM/DD') )");
+                whereParams.Add(new OracleParameter("in_to_date", inToTime.ToString("yyyy/MM/dd")));
+            }
+
+            // hangle out from date
+            // if no out out from time is given, the default out from time would be yesterday, we are doing to avoid huge data fetches unnecessarily
             DateTime outFromTime = DateTime.Now.AddDays(-1);
-            DateTime outToTime = DateTime.Now;
             if (outageQuery.OutFromDate != null)
             {
                 outFromTime = outageQuery.OutFromDate.Value;
             }
+            whereStrings.Add("( TRUNC(OUT_DATE) >= TO_DATE(:out_from_date,'YYYY/MM/DD') )");
+            whereParams.Add(new OracleParameter("out_from_date", outFromTime.ToString("yyyy/MM/dd")));
+
+            // hangle out to date
             if (outageQuery.OutToDate != null)
             {
-                outToTime = outageQuery.OutToDate.Value;
-            }
-            whereStrings.Add("( TRUNC(OUT_DATE) BETWEEN TO_DATE(:out_from_date,'YYYY/MM/DD') AND TO_DATE(:out_to_date,'YYYY/MM/DD') )");
-            whereParams.Add(new OracleParameter("out_from_date", outFromTime.ToString("yyyy/MM/dd")));
-            whereParams.Add(new OracleParameter("out_to_date", outToTime.ToString("yyyy/MM/dd")));
-
-            // hangle in date
-            DateTime inFromTime = DateTime.Now.AddDays(-1);
-            DateTime inToTime = DateTime.Now;
-            if (outageQuery.InFromDate != null)
-            {
-                inFromTime = outageQuery.InFromDate.Value;
-            }
-            if (outageQuery.InToDate != null)
-            {
-                inToTime = outageQuery.InToDate.Value;
-            }
-            whereStrings.Add("( TRUNC(IN_DATE) BETWEEN TO_DATE(:in_from_date,'YYYY/MM/DD') AND TO_DATE(:in_to_date,'YYYY/MM/DD') )");
-            whereParams.Add(new OracleParameter("in_from_date", outFromTime.ToString("yyyy/MM/dd")));
-            whereParams.Add(new OracleParameter("in_to_date", outToTime.ToString("yyyy/MM/dd")));
+                DateTime outToTime = outageQuery.OutToDate.Value;
+                whereStrings.Add("( TRUNC(OUT_DATE) <= TO_DATE(:out_to_date,'YYYY/MM/DD') )");
+                whereParams.Add(new OracleParameter("out_to_date", outToTime.ToString("yyyy/MM/dd")));
+            }            
 
             string whereStr = string.Join(" AND ", whereStrings);
             if (!string.IsNullOrWhiteSpace(whereStr))
@@ -126,7 +130,11 @@ namespace OutageDataLayer.DataLayer
                 }
                 if (inTimeIndex != -1)
                 {
-                    res.InTime = (DateTime)tableRowsResult.TableRows[rowIter][inTimeIndex];
+                    var inTime = tableRowsResult.TableRows[rowIter][inTimeIndex];
+                    if (inTime.GetType() != typeof(System.DBNull))
+                    {
+                        res.InTime = (DateTime)inTime;
+                    }
                 }
                 if (outTimeIndex != -1)
                 {
@@ -143,7 +151,6 @@ namespace OutageDataLayer.DataLayer
                     {
                         res.OutageType = (string)outageType;
                     }
-
                 }
                 if (outageReasonIndex != -1)
                 {

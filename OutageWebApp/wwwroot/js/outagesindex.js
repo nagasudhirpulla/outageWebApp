@@ -2,7 +2,7 @@
     // Setup - add a text input to each footer cell
     $('#outageResultsDiv tfoot th').each(function (i) {
         var title = $('#outageResultsDiv thead th').eq($(this).index()).text();
-        $(this).html('<input placeholder="Search ' + title + '" data-index="' + i + '" type="text" />');
+        $(this).html('<input placeholder="' + title + '" data-index="' + i + '" type="text" />');
     });
 
     // DataTable
