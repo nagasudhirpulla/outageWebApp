@@ -14,7 +14,8 @@
         fixedColumns: true,
         lengthMenu: [[10, 25, 50, 100, 500, 1000, -1], [10, 25, 50, 100, 500, 1000, "All"]],
         buttons: ['copyHtml5', 'excelHtml5', 'csvHtml5', 'pdfHtml5'],
-        pageLength: 50
+        pageLength: 50,
+        "order": [[3, "desc"]]
     });
 
     // Filter event handler
